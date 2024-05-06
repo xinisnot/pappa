@@ -1,49 +1,52 @@
 import("stdfaust.lib");
 
-ui_or     = nentry("or",  0, 0, 254, 1);
-ui_and    = nentry("and", 0, 0, 254, 1);
-ui_xor    = nentry("xor", 0, 0, 255, 1);
-ui_del    = nentry("delay",    0,   0, 0.1, 0.00000001) : si.smoo;
-ui_fb     = nentry("feedback", 0,   0, 1,   0.00000001) : si.smoo;
-ui_cutoff = nentry("cutoff",   1,   0, 1,   0.00000001) : si.smoo;
-ui_q      = nentry("q",        0,   0, 25,  0.00000001) : si.smoo;
-ui_gain   = nentry("gain",     0, -70, 12,  0.00000001) : ba.db2linear : si.smoo;
-ui_bypass = checkbox("bypass");
+// ui and params
 
+fxGroup(x)  = hgroup("[0]fx", x);
+bitGroup(x) = fxGroup(hgroup("[0]bitwise operation", x));
+fbGroup(x)  = fxGroup(hgroup("[1]feedback", x));
+bypass      = fxGroup(checkbox("[2]bypass"));
 
-//============================================================================================
-// functions
+bitFlip  = bitGroup(vslider("[0]flip", 0, 0, 255, 1));
+bitMute  = bitGroup(vslider("[1]mute", 0, 0, 255, 1));
+fbType   = fbGroup (vslider("[0]type",      0,   0,     2, 1));
+fbAmount = fbGroup (vslider("[1]feedback",  0,  -2,     2, 0.001)) : si.smoo;
+fbCutoff = fbGroup (vslider("[2]cutoff",    400, 0, 22050, 0.001)) : si.smoo;
+fbRes    = fbGroup (vslider("[3]resonance", 0.5, 0,     1, 0.001)) : si.smoo;
 
-bipolar2eightBit(x) = int((x+1)*127.5);
-eightBit2bipolar(x) = x/127.5 - 1;
+// effects
 
-biscuitXOR(arg_amt, x) = x : bipolar2eightBit : xor(arg_amt) : eightBit2bipolar;
-biscuitAND(arg_amt, x) = x : bipolar2eightBit : &(p_amt) : eightBit2bipolar : +(p_offset) : *(p_scale)
+nonlinearFeedback(type, amount, cutoff, res, x)
+    = x
+    : saturation(amount)
+    : filter(type, cutoff, res)
+    : fi.dcblocker
 with {
-    p_amt = 255 - arg_amt;
-    p_offset = arg_amt / 255;
-    p_scale  = 255 / select2(p_amt==0, p_amt, 255);
+    saturation(amount, x) = (amount, x) : * : ma.tanh;
+    filter(type, cutoff, res, x) = x <: fi.svf.lp(cutoff, res), fi.svf.hp(cutoff, res), fi.svf.bp(cutoff, res) : select3(type);
 };
-biscuitOR(arg_amt, x) = x : bipolar2eightBit : |(arg_amt) : eightBit2bipolar : +(p_offset) : *(p_scale)
+
+bitwiseOp(xorAmt, andAmt, x)
+    = x : to8bit
+    : (_, xorAmt) : xor
+    : (_, amount) : &
+    : from8bit : (_, offset) : + : (_, scale) : *
 with {
-    p_offset = -arg_amt / 255;
-    p_scale  = 255/select2(arg_amt==255, 255-arg_amt, 255);
+    to8bit(x)   = (x, 1)      : + : (_, 127.5) : * : int;
+    from8bit(x) = (x, 127.5)  : / : (_, 1)     : -;
+
+    amount = (255, andAmt) : -;
+    offset = (andAmt, 255) : /;
+    scale  = (amount, 255)  : select2(amount == 0) : (255, _) : /;
 };
 
-biscuit(arg_amtOR, arg_amtAND, arg_amtXOR, x) = x : biscuitXOR(arg_amtXOR) : biscuitAND(arg_amtAND) : biscuitOR(arg_amtOR);
+// process
 
-delayLine(arg_maxDur, arg_dur, arg_gain, x) = x@(min(p_maxDur, max(0, p_dur))) : *(arg_gain)
-with
-{
-    p_maxDur = ma.SR * arg_maxDur;
-    p_dur    = ma.SR * arg_dur;
+process = _, _ :  pappa
+with {
+    pappaMono(x)
+        = ((x, _) : + : bitwiseOp(bitFlip, bitMute))
+        ~ (_@(ma.BS) : nonlinearFeedback(fbType, fbAmount, fbCutoff, fbRes));
+
+    pappa = _, _ : ba.bypass2(bypass, (pappaMono, pappaMono));
 };
-
-
-
-//============================================================================================
-// main loop
-
-fx = (biscuit(ui_or, ui_and, ui_xor, +(_)) : ve.moogLadder(ui_cutoff, ui_q)) ~ delayLine(1, ui_del, ui_fb);
-
-process = _, _ : ba.bypass2(ui_bypass, (fx, fx)) : *(ui_gain), *(ui_gain);

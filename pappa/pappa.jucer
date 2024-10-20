@@ -13,7 +13,8 @@
               pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut">
   <MAINGROUP id="DIThxi" name="pappa">
     <GROUP id="{3EA8B881-7A5A-9E29-6E83-82528C15E424}" name="Source">
-      <FILE id="BecAMR" name="FaustPluginProcessor.cpp" compile="1" resource="0"
+      <FILE id="oQL2Hq" name="LuluKnobLaf.h" compile="0" resource="0" file="LuluKnobLaf.h"/>
+      <FILE id="GFmg5h" name="FaustPluginProcessor.cpp" compile="1" resource="0"
             file="FaustPluginProcessor.cpp"/>
     </GROUP>
   </MAINGROUP>

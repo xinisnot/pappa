@@ -10591,7 +10591,7 @@ class uiSlider : public uiComponent, public uiConverter, private juce::Slider::L
                     fStyle = juce::Slider::SliderStyle::IncDecButtons;
                     break;
                 case Knob:
-                    fStyle = juce::Slider::SliderStyle::Rotary;
+                    fStyle = juce::Slider::SliderStyle::RotaryVerticalDrag;
                     fSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
                     break;
                 default:
@@ -15704,16 +15704,22 @@ struct mydsp : public base_dsp {
 	
 	virtual void buildUserInterface(UI* ui_interface) {
 		ui_interface->declare(0, "0", "");
-		ui_interface->openHorizontalBox("pappa");
+		ui_interface->openHorizontalBox("pappa by @xinisnot");
 		ui_interface->declare(&fVslider1, "0", "");
+		ui_interface->declare(&fVslider1, "style", "knob");
 		ui_interface->addVerticalSlider("flip", &fVslider1, FAUSTFLOAT(0.0f), FAUSTFLOAT(0.0f), FAUSTFLOAT(255.0f), FAUSTFLOAT(1.0f));
 		ui_interface->declare(&fVslider0, "1", "");
+		ui_interface->declare(&fVslider0, "style", "knob");
 		ui_interface->addVerticalSlider("mute", &fVslider0, FAUSTFLOAT(0.0f), FAUSTFLOAT(0.0f), FAUSTFLOAT(255.0f), FAUSTFLOAT(1.0f));
 		ui_interface->declare(&fVslider4, "2", "");
+		ui_interface->declare(&fVslider4, "style", "knob");
+		ui_interface->declare(&fVslider4, "unit", "dB");
 		ui_interface->addVerticalSlider("feedback", &fVslider4, FAUSTFLOAT(-7e+01f), FAUSTFLOAT(-7e+01f), FAUSTFLOAT(36.0f), FAUSTFLOAT(0.001f));
 		ui_interface->declare(&fVslider2, "3", "");
+		ui_interface->declare(&fVslider2, "style", "knob");
 		ui_interface->addVerticalSlider("cutoff", &fVslider2, FAUSTFLOAT(0.0f), FAUSTFLOAT(0.0f), FAUSTFLOAT(1.0f), FAUSTFLOAT(0.001f));
 		ui_interface->declare(&fVslider3, "4", "");
+		ui_interface->declare(&fVslider3, "style", "knob");
 		ui_interface->addVerticalSlider("resonance", &fVslider3, FAUSTFLOAT(0.0f), FAUSTFLOAT(0.0f), FAUSTFLOAT(25.0f), FAUSTFLOAT(0.001f));
 		ui_interface->closeBox();
 	}
@@ -15794,18 +15800,18 @@ struct mydsp : public base_dsp {
 	#define FAUST_ACTIVES 5
 	#define FAUST_PASSIVES 0
 
-	FAUST_ADDVERTICALSLIDER("[0]pappa/flip", fVslider1, 0.0f, 0.0f, 255.0f, 1.0f);
-	FAUST_ADDVERTICALSLIDER("[0]pappa/mute", fVslider0, 0.0f, 0.0f, 255.0f, 1.0f);
-	FAUST_ADDVERTICALSLIDER("[0]pappa/feedback", fVslider4, -7e+01f, -7e+01f, 36.0f, 0.001f);
-	FAUST_ADDVERTICALSLIDER("[0]pappa/cutoff", fVslider2, 0.0f, 0.0f, 1.0f, 0.001f);
-	FAUST_ADDVERTICALSLIDER("[0]pappa/resonance", fVslider3, 0.0f, 0.0f, 25.0f, 0.001f);
+	FAUST_ADDVERTICALSLIDER("[0]pappa by @xinisnot/flip", fVslider1, 0.0f, 0.0f, 255.0f, 1.0f);
+	FAUST_ADDVERTICALSLIDER("[0]pappa by @xinisnot/mute", fVslider0, 0.0f, 0.0f, 255.0f, 1.0f);
+	FAUST_ADDVERTICALSLIDER("[0]pappa by @xinisnot/feedback", fVslider4, -7e+01f, -7e+01f, 36.0f, 0.001f);
+	FAUST_ADDVERTICALSLIDER("[0]pappa by @xinisnot/cutoff", fVslider2, 0.0f, 0.0f, 1.0f, 0.001f);
+	FAUST_ADDVERTICALSLIDER("[0]pappa by @xinisnot/resonance", fVslider3, 0.0f, 0.0f, 25.0f, 0.001f);
 
 	#define FAUST_LIST_ACTIVES(p) \
-		p(VERTICALSLIDER, flip, "[0]pappa/flip", fVslider1, 0.0f, 0.0f, 255.0f, 1.0f) \
-		p(VERTICALSLIDER, mute, "[0]pappa/mute", fVslider0, 0.0f, 0.0f, 255.0f, 1.0f) \
-		p(VERTICALSLIDER, feedback, "[0]pappa/feedback", fVslider4, -7e+01f, -7e+01f, 36.0f, 0.001f) \
-		p(VERTICALSLIDER, cutoff, "[0]pappa/cutoff", fVslider2, 0.0f, 0.0f, 1.0f, 0.001f) \
-		p(VERTICALSLIDER, resonance, "[0]pappa/resonance", fVslider3, 0.0f, 0.0f, 25.0f, 0.001f) \
+		p(VERTICALSLIDER, flip, "[0]pappa by @xinisnot/flip", fVslider1, 0.0f, 0.0f, 255.0f, 1.0f) \
+		p(VERTICALSLIDER, mute, "[0]pappa by @xinisnot/mute", fVslider0, 0.0f, 0.0f, 255.0f, 1.0f) \
+		p(VERTICALSLIDER, feedback, "[0]pappa by @xinisnot/feedback", fVslider4, -7e+01f, -7e+01f, 36.0f, 0.001f) \
+		p(VERTICALSLIDER, cutoff, "[0]pappa by @xinisnot/cutoff", fVslider2, 0.0f, 0.0f, 1.0f, 0.001f) \
+		p(VERTICALSLIDER, resonance, "[0]pappa by @xinisnot/resonance", fVslider3, 0.0f, 0.0f, 25.0f, 0.001f) \
 
 	#define FAUST_LIST_PASSIVES(p) \
 

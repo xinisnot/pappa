@@ -1,12 +1,11 @@
 import("stdfaust.lib");
 
 // ui and params
-fxGroup(x)  = hgroup("[0]pappa", x);
-bitFlip     = fxGroup(vslider("[0]flip", 0, 0, 255, 1));
-bitMute     = fxGroup(vslider("[1]mute", 0, 0, 255, 1));
-fbAmount    = fxGroup(vslider("[2]feedback", -70, -70, 36, 0.001)) : ba.db2linear : si.smoo;
-fbCutoff    = fxGroup(vslider("[3]cutoff",    0,  0,   1,  0.001)) : si.smoo;
-fbRes       = fxGroup(vslider("[4]resonance", 0,  0,   25, 0.001)) : si.smoo;
+bitFlip     = vslider("[0]flip[style:knob]",                0,  0,    255, 1);
+bitMute     = vslider("[1]mute[style:knob]",                0,  0,    255, 1);
+fbAmount    = vslider("[2]feedback[style:knob][unit:dB]",   -70, -70, 36,  0.001) : ba.db2linear : si.smoo;
+fbCutoff    = vslider("[3]cutoff[style:knob]",              0,  0,    1,   0.001) : si.smoo;
+fbQ         = vslider("[4]q[style:knob]",                   0,  0,    25,  0.001) : si.smoo;
 
 // effects
 nonlinearFeedback(amount, cutoff, res, x)
@@ -33,6 +32,6 @@ with {
     scale  = (amount, 255)  : select2(amount == 0) : (255, _) : /;
 };
 
-pappa(x) = ((x, _) : + : bitwiseOp(bitFlip, bitMute)) ~ (_@(ma.BS) : nonlinearFeedback(fbAmount, fbCutoff, fbRes));
+pappa(x) = ((x, _) : + : bitwiseOp(bitFlip, bitMute)) ~ (_@(ma.BS) : nonlinearFeedback(fbAmount, fbCutoff, fbQ));
 
 process = _, _ :  pappa, pappa;

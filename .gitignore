@@ -1,5 +1,4 @@
 .DS_Store
 .vscode
-pappa/
-!/pappa/FaustPluginProcessor.cpp
-!/pappa/pappa.jucer
+pappa/Builds
+pappa/JuceLibraryCode

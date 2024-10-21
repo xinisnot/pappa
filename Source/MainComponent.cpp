@@ -40,7 +40,7 @@ MainComponent::MainComponent()
     
     sliderFlip.setTooltip           ("[flip]");
     sliderMute.setTooltip           ("[mute]");
-    sliderFeedback.setTooltip       ("[feedback]");
+    sliderFeedback.setTooltip       ("[feedback] (unit: dB)");
     sliderCutoff.setTooltip         ("[cutoff]");
     sliderQ.setTooltip              ("[q]");
     

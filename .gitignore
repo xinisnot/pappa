@@ -1,6 +1,4 @@
 .DS_Store
 .vscode
-pappa/Builds
-pappa/JuceLibraryCode
-ui/NewProject/Builds
-ui/NewProject/JuceLibraryCode
+Builds
+JuceLibraryCode

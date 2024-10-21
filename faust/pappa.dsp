@@ -1,3 +1,5 @@
+declare filename "pappa.dsp";
+declare name "pappa";
 import("stdfaust.lib");
 
 // ui and params

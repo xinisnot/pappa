@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------
 name: "pappa"
 Code generated with Faust 2.72.14 (https://faust.grame.fr)
-Compilation options: -a faustMinimal.h -lang cpp -i -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0
+Compilation options: -a arch.h -lang cpp -i -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0
 ------------------------------------------------------------ */
 
 #ifndef  __mydsp_H__
@@ -1188,7 +1188,7 @@ class mydsp : public dsp {
 		m->declare("basics.lib/name", "Faust Basic Element Library");
 		m->declare("basics.lib/tabulateNd", "Copyright (C) 2023 Bart Brouns <bart@magnetophon.nl>");
 		m->declare("basics.lib/version", "1.15.0");
-		m->declare("compile_options", "-a faustMinimal.h -lang cpp -i -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0");
+		m->declare("compile_options", "-a arch.h -lang cpp -i -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0");
 		m->declare("filename", "pappa.dsp");
 		m->declare("filters.lib/dcblocker:author", "Julius O. Smith III");
 		m->declare("filters.lib/dcblocker:copyright", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
@@ -1358,7 +1358,7 @@ class mydsp : public dsp {
 			float fTemp3 = 2.0f * (fTemp0 / fTemp2) + -1.0f;
 			float fTemp4 = fTemp0 * fTemp3;
 			float fTemp5 = 0.0823286f * (mydsp_faustpower2_f(fTemp0) * fTemp1 * fTemp3 / mydsp_faustpower2_f(fTemp2)) + 1.0f;
-			float fTemp6 = fTemp0 * ((tanhf(fRec7[0] * fRec0[(IOTA0 - iSlow4) & 32767]) - fTemp1 * (0.1646572f * fRec5[1] + 0.0823286f * fRec4[1] * fTemp3 + 0.0823286f * (fTemp4 * fRec3[1] / fTemp2)) / fTemp2) / fTemp5 - fRec3[1]) / fTemp2;
+			float fTemp6 = fTemp0 * ((tanhf(fRec7[0] * fRec0[(IOTA0 - iSlow4) & 32767]) - fTemp1 * (0.0823286f * fRec4[1] * fTemp3 + 0.1646572f * fRec5[1] + 0.0823286f * (fTemp4 * fRec3[1] / fTemp2)) / fTemp2) / fTemp5 - fRec3[1]) / fTemp2;
 			float fTemp7 = fTemp0 * (fRec3[1] + fTemp6 - fRec4[1]) / fTemp2;
 			float fTemp8 = fRec4[1] + fTemp7;
 			float fTemp9 = fTemp0 * (fTemp8 - fRec5[1]) / fTemp2;
@@ -1369,7 +1369,7 @@ class mydsp : public dsp {
 			fRec1[0] = fRec2[0] + 0.995f * fRec1[1] - fRec2[1];
 			fRec0[IOTA0 & 32767] = 255.0f * ((fSlow1 + 0.007843138f * float((int(127.5f * (float(input0[i0]) + fRec1[0] + 1.0f)) ^ iSlow6) & iSlow8) + -1.0f) / fSlow9);
 			output0[i0] = FAUSTFLOAT(fRec0[IOTA0 & 32767]);
-			float fTemp10 = fTemp0 * ((tanhf(fRec7[0] * fRec9[(IOTA0 - iSlow4) & 32767]) - fTemp1 * (0.0823286f * fTemp3 * fRec13[1] + 0.1646572f * fRec14[1] + 0.0823286f * (fTemp4 * fRec12[1] / fTemp2)) / fTemp2) / fTemp5 - fRec12[1]) / fTemp2;
+			float fTemp10 = fTemp0 * ((tanhf(fRec7[0] * fRec9[(IOTA0 - iSlow4) & 32767]) - fTemp1 * (0.1646572f * fRec14[1] + 0.0823286f * fTemp3 * fRec13[1] + 0.0823286f * (fTemp4 * fRec12[1] / fTemp2)) / fTemp2) / fTemp5 - fRec12[1]) / fTemp2;
 			float fTemp11 = fTemp0 * (fRec12[1] + fTemp10 - fRec13[1]) / fTemp2;
 			float fTemp12 = fRec13[1] + fTemp11;
 			float fTemp13 = fTemp0 * (fTemp12 - fRec14[1]) / fTemp2;

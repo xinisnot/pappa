@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="kVLEjt" name="pappa" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="uhLil2" name="pappa" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
-  <MAINGROUP id="Utmpy5" name="pappa">
-    <GROUP id="{122DF923-C407-EF4F-09FA-A8639B11DB72}" name="Source">
-      <FILE id="s5glt1" name="Pappa.h" compile="0" resource="0" file="Source/Pappa.h"/>
-      <FILE id="d4XDKX" name="LuluDial.h" compile="0" resource="0" file="Source/LuluDial.h"/>
-      <FILE id="Y2d8QA" name="LuluToggle.h" compile="0" resource="0" file="Source/LuluToggle.h"/>
-      <FILE id="Hq6pLk" name="MainComponent.cpp" compile="1" resource="0"
-            file="Source/MainComponent.cpp"/>
-      <FILE id="UfDCVp" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
-      <FILE id="puVBUy" name="PluginProcessor.cpp" compile="1" resource="0"
+  <MAINGROUP id="igwec8" name="pappa">
+    <GROUP id="{5B3E6113-5E3C-87A6-EB50-463DCC18CCA2}" name="Source">
+      <FILE id="GczLNc" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
-      <FILE id="GXWp6v" name="PluginProcessor.h" compile="0" resource="0"
+      <FILE id="kntdYw" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="Ksov2P" name="PluginEditor.cpp" compile="1" resource="0"
+      <FILE id="E7Twlz" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="sz7iBQ" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="KGnVgk" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="IubLdj" name="LuluDial.h" compile="0" resource="0" file="Source/LuluDial.h"/>
+      <FILE id="BM8EAs" name="PappaDsp.h" compile="0" resource="0" file="Source/PappaDsp.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

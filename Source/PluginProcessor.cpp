@@ -1,191 +1,150 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-//==============================================================================
+
 PappaAudioProcessor::PappaAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+     : AudioProcessor (BusesProperties().withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
+// initialize AudioProcessorValueTreeState
+,parameters(*this,
+            nullptr,
+            juce::Identifier("pappaParam"),
+            {
+                std::make_unique<juce::AudioParameterFloat> ("flip",
+                                                             "Flip",
+                                                             juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f),
+                                                             0.0f),
+                std::make_unique<juce::AudioParameterFloat> ("mute",
+                                                             "Mute",
+                                                             juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f),
+                                                             0.0f),
+                std::make_unique<juce::AudioParameterFloat> ("feedback",
+                                                             "Feedback",
+                                                             juce::NormalisableRange<float>(-70.0f, 36.0f),
+                                                             -70.0f),
+                std::make_unique<juce::AudioParameterFloat> ("cutoff",
+                                                             "Cutoff",
+                                                             juce::NormalisableRange<float>(0.0f, 1.0f),
+                                                             0.0f),
+                std::make_unique<juce::AudioParameterFloat> ("q",
+                                                             "Q",
+                                                             juce::NormalisableRange<float>(0.0f, 25.0f),
+                                                             0.0f)
+})
 {
+    flip     = parameters.getRawParameterValue("flip");
+    mute     = parameters.getRawParameterValue("mute");
+    feedback = parameters.getRawParameterValue("feedback");
+    cutoff   = parameters.getRawParameterValue("cutoff");
+    q        = parameters.getRawParameterValue("q");
 }
 
-PappaAudioProcessor::~PappaAudioProcessor()
+PappaAudioProcessor::~PappaAudioProcessor() {}
+juce::AudioProcessorEditor* PappaAudioProcessor::createEditor() { return new PappaAudioProcessorEditor (*this, parameters); }
+
+//==============================================================================
+
+void PappaAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
+    auto state = parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
+}
+
+
+void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+{
+    // restore parameters from this memory block.
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    
+    if (xmlState.get() != nullptr)
+        if(xmlState->hasTagName(parameters.state.getType()))
+            parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
 }
 
 //==============================================================================
-const juce::String PappaAudioProcessor::getName() const
-{
-    return JucePlugin_Name;
-}
 
-bool PappaAudioProcessor::acceptsMidi() const
-{
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-bool PappaAudioProcessor::producesMidi() const
-{
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-bool PappaAudioProcessor::isMidiEffect() const
-{
-   #if JucePlugin_IsMidiEffect
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-double PappaAudioProcessor::getTailLengthSeconds() const
-{
-    return 0.0;
-}
-
-int PappaAudioProcessor::getNumPrograms()
-{
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
-}
-
-int PappaAudioProcessor::getCurrentProgram()
-{
-    return 0;
-}
-
-void PappaAudioProcessor::setCurrentProgram (int index)
-{
-}
-
-const juce::String PappaAudioProcessor::getProgramName (int index)
-{
-    return {};
-}
-
-void PappaAudioProcessor::changeProgramName (int index, const juce::String& newName)
-{
-}
-
-//==============================================================================
 void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    fUI  = new MapUI();
+    fDSP = new mydsp();
+    fDSP->init(sampleRate);
+    fDSP->buildUserInterface(fUI);
+    
+    inputs  = new float*[2];
+    outputs = new float*[2];
+    
+    for (int channel = 0; channel < 2; ++channel) {
+        inputs [channel] = new float[samplesPerBlock];
+        outputs[channel] = new float[samplesPerBlock];
+    }
+}
+
+void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    ScopedNoDenormals noDenormals;
+    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumOutputChannels = getTotalNumOutputChannels();
+
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+        for (int i = 0; i < buffer.getNumSamples(); i++)
+            inputs[channel][i] = *buffer.getWritePointer(channel,i);
+
+    fUI->setParamValue("flip",     *flip);
+    fUI->setParamValue("mute",     *mute);
+    fUI->setParamValue("feedback", *feedback);
+    fUI->setParamValue("cutoff",   *cutoff);
+    fUI->setParamValue("q",        *q);
+    
+    fDSP->compute(buffer.getNumSamples(),inputs,outputs);
+
+    for (int channel = 0; channel < totalNumOutputChannels; ++channel)
+        for (int i = 0; i < buffer.getNumSamples(); i++)
+            *buffer.getWritePointer(channel,i) = outputs[channel][i];
 }
 
 void PappaAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    delete fDSP;
+    delete fUI;
+    
+    for (int channel = 0; channel < 2; ++channel) {
+        delete[] inputs [channel];
+        delete[] outputs[channel];
+    }
+    
+    delete [] inputs;
+    delete [] outputs;
 }
+
+
+//==============================================================================
+
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool PappaAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-  #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
-
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
 
     return true;
-  #endif
 }
 #endif
 
-void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
-{
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
-}
-
-//==============================================================================
-bool PappaAudioProcessor::hasEditor() const
-{
-    return true; // (change this to false if you choose to not supply an editor)
-}
-
-juce::AudioProcessorEditor* PappaAudioProcessor::createEditor()
-{
-    return new PappaAudioProcessorEditor (*this);
-}
-
-//==============================================================================
-void PappaAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
-{
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-}
-
-void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-}
-
-//==============================================================================
-// This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new PappaAudioProcessor();
-}
+const juce::String PappaAudioProcessor::getName() const { return JucePlugin_Name; }
+bool PappaAudioProcessor::acceptsMidi() const { return false; }
+bool PappaAudioProcessor::producesMidi() const { return false; }
+bool PappaAudioProcessor::isMidiEffect() const { return false; }
+double PappaAudioProcessor::getTailLengthSeconds() const { return 0.0; }
+int PappaAudioProcessor::getNumPrograms() { return 1; }
+int PappaAudioProcessor::getCurrentProgram() { return 0; }
+void PappaAudioProcessor::setCurrentProgram (int index) {}
+const juce::String PappaAudioProcessor::getProgramName (int index) { return {}; }
+void PappaAudioProcessor::changeProgramName (int index, const juce::String& newName) {}
+bool PappaAudioProcessor::hasEditor() const { return true; }
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new PappaAudioProcessor(); }

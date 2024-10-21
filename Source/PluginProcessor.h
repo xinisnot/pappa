@@ -1,7 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "PappaDsp.h"
+#include "../dsp/PappaDsp.h"
 
 
 class PappaAudioProcessor  : public juce::AudioProcessor

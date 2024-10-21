@@ -3,6 +3,9 @@
 <JUCERPROJECT id="uhLil2" name="pappa" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="igwec8" name="pappa">
+    <GROUP id="{AE4EC076-286A-8EA8-8ACE-EB75D10A7A6D}" name="dsp">
+      <FILE id="b4jW62" name="PappaDsp.h" compile="0" resource="0" file="dsp/PappaDsp.h"/>
+    </GROUP>
     <GROUP id="{5B3E6113-5E3C-87A6-EB50-463DCC18CCA2}" name="Source">
       <FILE id="GczLNc" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -12,7 +15,6 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="KGnVgk" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="IubLdj" name="LuluDial.h" compile="0" resource="0" file="Source/LuluDial.h"/>
-      <FILE id="BM8EAs" name="PappaDsp.h" compile="0" resource="0" file="Source/PappaDsp.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

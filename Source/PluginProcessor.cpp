@@ -49,6 +49,7 @@ void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes
 
 void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    // prepareToPlay() may be called twice by host.
     if (flagForAllocateMemory) {
         flagForAllocateMemory = false;
         
@@ -94,6 +95,7 @@ void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
 void PappaAudioProcessor::releaseResources()
 {
+    // releaseResources() may be called twice by host.
     if (flagForFreeMemory) {
         flagForFreeMemory = false;
         

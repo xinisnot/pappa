@@ -38,7 +38,6 @@ void PappaAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 
 void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // restore parameters from this memory block.
     std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
     
     if (xmlState.get() != nullptr)
@@ -50,16 +49,22 @@ void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes
 
 void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    fDSP = new mydsp();
-    fDSP->init(sampleRate);
-    fUI = new MapUI();
-    fDSP->buildUserInterface(fUI);
+    if (flagForAllocateMemory) {
+        flagForAllocateMemory = false;
+        
+        fUI  = new MapUI();
+        fDSP = new mydsp();
+        
+        fDSP->init(sampleRate);
+        fDSP->buildUserInterface(fUI);
 
-    inputs  = new float*[2];
-    outputs = new float*[2];
-    for (int channel = 0; channel < 2; ++channel) {
-        inputs [channel] = new float[samplesPerBlock];
-        outputs[channel] = new float[samplesPerBlock];
+        inputs  = new float*[2];
+        outputs = new float*[2];
+        
+        for (int channel = 0; channel < 2; ++channel) {
+            inputs [channel] = new float[samplesPerBlock];
+            outputs[channel] = new float[samplesPerBlock];
+        }
     }
 }
 
@@ -79,7 +84,8 @@ void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     fUI->setParamValue("cutoff",   *cutoff);
     fUI->setParamValue("q",        *q);
     
-    fDSP->compute(buffer.getNumSamples(),inputs,outputs);
+    fDSP->compute(buffer.getNumSamples(),inputs, outputs);
+    fDSP->compute(buffer.getNumSamples(),inputs, outputs);
 
     for (int channel = 0; channel < totalNumOutputChannels; ++channel)
         for (int i = 0; i < buffer.getNumSamples(); i++)
@@ -88,15 +94,19 @@ void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
 void PappaAudioProcessor::releaseResources()
 {
-    delete fDSP;
-    delete fUI;
+    if (flagForFreeMemory) {
+        flagForFreeMemory = false;
+        
+        delete fDSP;
+        delete fUI;
 
-    for (int channel = 0; channel < 2; ++channel) {
-        delete[] inputs [channel];
-        delete[] outputs[channel];
+        for (int channel = 0; channel < 2; ++channel) {
+            delete[] inputs [channel];
+            delete[] outputs[channel];
+        }
+        delete[]  inputs;
+        delete[]  outputs;
     }
-    delete[] inputs;
-    delete[] outputs;
 }
 
 

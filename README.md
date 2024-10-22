@@ -4,7 +4,7 @@ pappa (derived from "発破") is a bit-crusher, which is inspired some nice gadg
 
 # How to build
 
-pappa is made with JUCE (GUI) and Faust (DSP). After installing JUCE and Faust, generate `Pappa.Dsp.h` in `/dsp` with following command. This is header-only class for DSP which is included in `PluginProcessor.h`.
+pappa is made with JUCE (GUI) and Faust (DSP). After installing JUCE and Faust, generate `PappaDsp.h` in `/dsp` with following command. This is header-only class for DSP which is included in `PluginProcessor.h`.
 
 ```
 $ cd dsp

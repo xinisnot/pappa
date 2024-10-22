@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="uhLil2" name="pappa" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginManufacturer="xin"
+              companyName="xin" pluginVST3Category="Distortion">
   <MAINGROUP id="igwec8" name="pappa">
     <GROUP id="{AE4EC076-286A-8EA8-8ACE-EB75D10A7A6D}" name="dsp">
       <FILE id="b4jW62" name="PappaDsp.h" compile="0" resource="0" file="dsp/PappaDsp.h"/>

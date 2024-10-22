@@ -4,35 +4,17 @@
 
 PappaAudioProcessor::PappaAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties().withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
+    : AudioProcessor (BusesProperties().withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
 // initialize AudioProcessorValueTreeState
-,parameters(*this,
-            nullptr,
-            juce::Identifier("pappaParam"),
-            {
-                std::make_unique<juce::AudioParameterFloat> ("flip",
-                                                             "Flip",
-                                                             juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f),
-                                                             0.0f),
-                std::make_unique<juce::AudioParameterFloat> ("mute",
-                                                             "Mute",
-                                                             juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f),
-                                                             0.0f),
-                std::make_unique<juce::AudioParameterFloat> ("feedback",
-                                                             "Feedback",
-                                                             juce::NormalisableRange<float>(-70.0f, 36.0f),
-                                                             -70.0f),
-                std::make_unique<juce::AudioParameterFloat> ("cutoff",
-                                                             "Cutoff",
-                                                             juce::NormalisableRange<float>(0.0f, 1.0f),
-                                                             0.0f),
-                std::make_unique<juce::AudioParameterFloat> ("q",
-                                                             "Q",
-                                                             juce::NormalisableRange<float>(0.0f, 25.0f),
-                                                             0.0f)
-})
+    , parameters(*this, nullptr, juce::Identifier("pappaParam"), {
+        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"flip",     1 }, "Flip",     juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f), 0.0f),
+        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"mute",     1 }, "Mute",     juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f), 0.0f),
+        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"feedback", 1 }, "Feedback", juce::NormalisableRange<float>(-70.0f, 36.0f), -70.0f),
+        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"cutoff",   1 }, "Cutoff",   juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f),
+        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"q",        1 }, "Q",        juce::NormalisableRange<float>(0.0f, 25.0f), 0.0f)
+    })
 {
     flip     = parameters.getRawParameterValue("flip");
     mute     = parameters.getRawParameterValue("mute");

@@ -1,6 +1,6 @@
 # About
 
-pappa (derived from "発破") is a bit-crusher, which is inspired some nice gadgets such as OTO Machines' Biscuit or Bastl Instruments' XOR. It is also released on [Gumroad](https://xinisnot.gumroad.com/l/lulu). If you like it, I would appreciate if you can leave a small tip.
+pappa (derived from "発破") is a bit-crusher, which is inspired some nice gadgets such as OTO Machines' Biscuit or Bastl Instruments' XOR. It is also released on [Gumroad](https://xinisnot.gumroad.com/l/pappa). If you like it, I would appreciate if you can leave a small tip.
 
 # How to build
 

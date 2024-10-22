@@ -68,14 +68,13 @@ void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes
 
 void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    fUI  = new MapUI();
     fDSP = new mydsp();
     fDSP->init(sampleRate);
+    fUI = new MapUI();
     fDSP->buildUserInterface(fUI);
-    
+
     inputs  = new float*[2];
     outputs = new float*[2];
-    
     for (int channel = 0; channel < 2; ++channel) {
         inputs [channel] = new float[samplesPerBlock];
         outputs[channel] = new float[samplesPerBlock];
@@ -109,14 +108,13 @@ void PappaAudioProcessor::releaseResources()
 {
     delete fDSP;
     delete fUI;
-    
+
     for (int channel = 0; channel < 2; ++channel) {
         delete[] inputs [channel];
         delete[] outputs[channel];
     }
-    
-    delete [] inputs;
-    delete [] outputs;
+    delete[] inputs;
+    delete[] outputs;
 }
 
 

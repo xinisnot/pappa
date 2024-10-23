@@ -13,7 +13,7 @@ PappaAudioProcessor::PappaAudioProcessor()
         std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"mute",     1 }, "Mute",     juce::NormalisableRange<float>(0.0f, 255.0f, 1.0f), 0.0f),
         std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"feedback", 1 }, "Feedback", juce::NormalisableRange<float>(-70.0f, 36.0f), -70.0f),
         std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"cutoff",   1 }, "Cutoff",   juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f),
-        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"q",        1 }, "Q",        juce::NormalisableRange<float>(0.0f, 25.0f), 0.0f)
+        std::make_unique<juce::AudioParameterFloat> (juce::ParameterID {"q",        1 }, "Q",        juce::NormalisableRange<float>(0.0f, 25.0f, 0, 0.25f), 0.0f)
     })
 {
     flip     = parameters.getRawParameterValue("flip");

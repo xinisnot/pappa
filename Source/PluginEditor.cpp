@@ -21,7 +21,7 @@ PappaAudioProcessorEditor::PappaAudioProcessorEditor (PappaAudioProcessor& p, ju
     labelTitle.setColour           (juce::Label::backgroundColourId, juce::Colour (0x00000000));
     labelTitle.setColour           (juce::Label::textColourId, juce::Colour(0xff606060));
     addAndMakeVisible              (labelTitle);
-
+    
     sliderFlip    .setTitle("flip");
     sliderMute    .setTitle("mute");
     sliderFeedback.setTitle("feedback");
@@ -39,8 +39,6 @@ PappaAudioProcessorEditor::PappaAudioProcessorEditor (PappaAudioProcessor& p, ju
     sliderFeedbackAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "feedback", sliderFeedback));
     sliderCutoffAttachment  .reset(new juce::AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "cutoff", sliderCutoff));
     sliderQAttachment       .reset(new juce::AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "q", sliderQ));
-    
-    sliderQ.setSkewFactorFromMidPoint(0.7);
     
     addAndMakeVisible(sliderFlip);
     addAndMakeVisible(sliderMute);

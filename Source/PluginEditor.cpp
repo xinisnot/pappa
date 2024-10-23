@@ -7,6 +7,14 @@ PappaAudioProcessorEditor::PappaAudioProcessorEditor (PappaAudioProcessor& p, ju
       audioProcessor (p),
       valueTreeState(vts)
 {
+    setSize(400, 95);
+    sliderFlip    .setBounds(0,   0,   80,  80);
+    sliderMute    .setBounds(80,  0,   80,  80);
+    sliderFeedback.setBounds(160, 0,   80,  80);
+    sliderCutoff  .setBounds(240, 0,   80,  80);
+    sliderQ       .setBounds(320, 0,   80,  80);
+    labelTitle    .setBounds(0,   80,  400, 15);
+    
     labelTitle.setFont             (juce::FontOptions(11.00f, juce::Font::plain));
     labelTitle.setJustificationType(juce::Justification::topRight);
     labelTitle.setEditable         (false, false, false);
@@ -32,19 +40,13 @@ PappaAudioProcessorEditor::PappaAudioProcessorEditor (PappaAudioProcessor& p, ju
     sliderCutoffAttachment  .reset(new juce::AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "cutoff", sliderCutoff));
     sliderQAttachment       .reset(new juce::AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "q", sliderQ));
     
+    sliderQ.setSkewFactorFromMidPoint(0.7);
+    
     addAndMakeVisible(sliderFlip);
     addAndMakeVisible(sliderMute);
     addAndMakeVisible(sliderFeedback);
     addAndMakeVisible(sliderCutoff);
     addAndMakeVisible(sliderQ);
-
-    setSize(400, 95);
-    sliderFlip    .setBounds(0,   0,   80,  80);
-    sliderMute    .setBounds(80,  0,   80,  80);
-    sliderFeedback.setBounds(160, 0,   80,  80);
-    sliderCutoff  .setBounds(240, 0,   80,  80);
-    sliderQ       .setBounds(320, 0,   80,  80);
-    labelTitle    .setBounds(0,   80,  400, 15);
 }
 
 PappaAudioProcessorEditor::~PappaAudioProcessorEditor()

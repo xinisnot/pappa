@@ -43,7 +43,7 @@ private:
     float** outputs;
     
     bool flagForAllocateMemory { true };
-    bool flagForFreeMemory     { true };
+    bool flagForFreeMemory     { false };
     
     // pointers for parameters (read only)
     std::atomic<float>* flip     = nullptr;

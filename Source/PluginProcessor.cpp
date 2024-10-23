@@ -66,18 +66,20 @@ void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
             inputs [channel] = new float[samplesPerBlock];
             outputs[channel] = new float[samplesPerBlock];
         }
+        
+        flagForFreeMemory = true;
     }
 }
 
 void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
-{
+{    
     ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
-        for (int i = 0; i < buffer.getNumSamples(); i++)
-            inputs[channel][i] = *buffer.getWritePointer(channel,i);
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+            inputs[channel][i] = *buffer.getWritePointer(channel, i);
 
     fUI->setParamValue("flip",     *flip);
     fUI->setParamValue("mute",     *mute);
@@ -86,10 +88,9 @@ void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     fUI->setParamValue("q",        *q);
     
     fDSP->compute(buffer.getNumSamples(),inputs, outputs);
-    fDSP->compute(buffer.getNumSamples(),inputs, outputs);
 
     for (int channel = 0; channel < totalNumOutputChannels; ++channel)
-        for (int i = 0; i < buffer.getNumSamples(); i++)
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
             *buffer.getWritePointer(channel,i) = outputs[channel][i];
 }
 
@@ -108,6 +109,8 @@ void PappaAudioProcessor::releaseResources()
         }
         delete[]  inputs;
         delete[]  outputs;
+        
+        flagForAllocateMemory = true;
     }
 }
 

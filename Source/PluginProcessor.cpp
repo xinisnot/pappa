@@ -21,6 +21,13 @@ PappaAudioProcessor::PappaAudioProcessor()
     feedback = parameters.getRawParameterValue("feedback");
     cutoff   = parameters.getRawParameterValue("cutoff");
     q        = parameters.getRawParameterValue("q");
+    
+    fUI      = std::make_unique<MapUI>();
+    fDSP     = std::make_unique<mydsp>();
+    inputs   = std::make_unique<std::unique_ptr<float[]>[]>(2);
+    outputs  = std::make_unique<std::unique_ptr<float[]>[]>(2);
+    
+    fDSP->buildUserInterface(fUI.get());
 }
 
 PappaAudioProcessor::~PappaAudioProcessor() {}
@@ -49,14 +56,7 @@ void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes
 
 void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    fUI  = std::make_unique<MapUI>();
-    fDSP = std::make_unique<mydsp>();
-    
     fDSP->init(sampleRate);
-    fDSP->buildUserInterface(fUI.get());
-    
-    inputs  = std::make_unique<std::unique_ptr<float[]>[]>(2);
-    outputs = std::make_unique<std::unique_ptr<float[]>[]>(2);
     
     for(int channel = 0; channel < 2; ++channel) {
         inputs [channel] = std::make_unique<float[]>(samplesPerBlock);

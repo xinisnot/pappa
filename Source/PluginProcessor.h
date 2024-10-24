@@ -36,14 +36,10 @@ public:
 private:
     juce::AudioProcessorValueTreeState parameters;
     
-    MapUI*  fUI;
-    dsp*    fDSP;
-    
-    float** inputs;
-    float** outputs;
-    
-    bool flagForAllocateMemory { true };
-    bool flagForFreeMemory     { false };
+    std::unique_ptr<MapUI>                      fUI;
+    std::unique_ptr<dsp>                        fDSP;
+    std::unique_ptr<std::unique_ptr<float[]>[]> inputs;
+    std::unique_ptr<std::unique_ptr<float[]>[]> outputs;
     
     // pointers for parameters (read only)
     std::atomic<float>* flip     = nullptr;

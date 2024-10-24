@@ -49,25 +49,18 @@ void PappaAudioProcessor::setStateInformation (const void* data, int sizeInBytes
 
 void PappaAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // prepareToPlay() may be called twice by host.
-    if (flagForAllocateMemory) {
-        flagForAllocateMemory = false;
-        
-        fUI  = new MapUI();
-        fDSP = new mydsp();
-        
-        fDSP->init(sampleRate);
-        fDSP->buildUserInterface(fUI);
-
-        inputs  = new float*[2];
-        outputs = new float*[2];
-        
-        for (int channel = 0; channel < 2; ++channel) {
-            inputs [channel] = new float[samplesPerBlock];
-            outputs[channel] = new float[samplesPerBlock];
-        }
-        
-        flagForFreeMemory = true;
+    fUI  = std::make_unique<MapUI>();
+    fDSP = std::make_unique<mydsp>();
+    
+    fDSP->init(sampleRate);
+    fDSP->buildUserInterface(fUI.get());
+    
+    inputs  = std::make_unique<std::unique_ptr<float[]>[]>(2);
+    outputs = std::make_unique<std::unique_ptr<float[]>[]>(2);
+    
+    for(int channel = 0; channel < 2; ++channel) {
+        inputs [channel] = std::make_unique<float[]>(samplesPerBlock);
+        outputs[channel] = std::make_unique<float[]>(samplesPerBlock);
     }
 }
 
@@ -87,32 +80,16 @@ void PappaAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     fUI->setParamValue("cutoff",   *cutoff);
     fUI->setParamValue("q",        *q);
     
-    fDSP->compute(buffer.getNumSamples(),inputs, outputs);
+    fDSP->compute(buffer.getNumSamples(),
+                  reinterpret_cast<float**>(inputs .get()),
+                  reinterpret_cast<float**>(outputs.get()));
 
     for (int channel = 0; channel < totalNumOutputChannels; ++channel)
         for (int i = 0; i < buffer.getNumSamples(); ++i)
             *buffer.getWritePointer(channel,i) = outputs[channel][i];
 }
 
-void PappaAudioProcessor::releaseResources()
-{
-    // releaseResources() may be called twice by host.
-    if (flagForFreeMemory) {
-        flagForFreeMemory = false;
-        
-        delete fDSP;
-        delete fUI;
-
-        for (int channel = 0; channel < 2; ++channel) {
-            delete[] inputs [channel];
-            delete[] outputs[channel];
-        }
-        delete[]  inputs;
-        delete[]  outputs;
-        
-        flagForAllocateMemory = true;
-    }
-}
+void PappaAudioProcessor::releaseResources() {}
 
 
 //==============================================================================
